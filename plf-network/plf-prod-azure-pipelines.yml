@@ -1,0 +1,37 @@
+trigger:
+  branches:
+    include:
+    - main
+
+parameters:
+- name: environment
+  type: string
+  default: 'prod'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  serviceConnectionName: 'Azoff-platform'
+  resourceGroupName: 'plf-net-rg-prod-wu3'
+  location: 'westus3'
+  deploymentName: 'Deployment$(Build.BuildId)'
+
+steps:
+- task: AzureCLI@2
+  displayName: 'Create Resource Group if not exists'
+  inputs:
+    azureSubscription: '$(serviceConnectionName)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az group create --name $(resourceGroupName) --location $(location)
+
+- task: AzureCLI@2
+  displayName: 'Deploy VNet ARM Template'
+  inputs:
+    azureSubscription: '$(serviceConnectionName)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az deployment group create --resource-group $(resourceGroupName) --name $(deploymentName) --template-file plf-network/hubvnet.json --parameters @plf-network/hubvnet.parameters.${{ parameters.environment }}.json
