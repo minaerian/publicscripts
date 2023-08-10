@@ -5,7 +5,7 @@ sudo apt update
 sudo apt install -y certbot
 
 # 2. Obtain the Certificate
-sudo certbot certonly --standalone -d unifi.itgold.net --email mina.info.tech@gmail.com --agree-tos
+sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/cloudflare.ini -d unifi.itgold.net --email mina.info.tech@gmail.com --agree-tos
 
 # If the certificate is successfully obtained, proceed to configure UniFi
 if [ $? -eq 0 ]; then
